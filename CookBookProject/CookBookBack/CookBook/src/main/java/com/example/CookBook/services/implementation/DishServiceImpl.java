@@ -14,7 +14,9 @@ import com.example.CookBook.repositories.IngredientRepository;
 import com.example.CookBook.repositories.StepRepository;
 import com.example.CookBook.services.DishService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,54 +25,49 @@ import java.util.Optional;
 public class DishServiceImpl implements DishService {
 
     private final DishRepository dishRepository;
-    private final IngredientRepository ingredientRepository;
-    private final StepRepository stepRepository;
 
-    public DishServiceImpl(DishRepository dishRepository, IngredientRepository ingredientRepository, StepRepository stepRepository) {
+    public DishServiceImpl(DishRepository dishRepository) {
         this.dishRepository = dishRepository;
-        this.ingredientRepository = ingredientRepository;
-        this.stepRepository = stepRepository;
     }
 
     @Override
     public DishDto addDish(DishDto dishDto) {
-        Dish dish = new Dish(dishDto.getName(), dishDto.getDescription(), dishDto.getPrepTime());
+        Dish dish = DishMapper.toEntity(dishDto);
 
-        /*List<Ingredient> ingredients = new ArrayList<>();
-        for (IngredientDto ingredientDto : dishDto.getIngredientList()) {
-            Ingredient ingredient = IngredientMapper.toEntity(ingredientDto);
-            ingredient.getDishes().add(dish);
-            ingredients.add(ingredient);
-        }
-        ingredientRepository.saveAll(ingredients);
-
-         */
         List<Ingredient> ingredients = DishMapper.toListIngredientEntity(dishDto.getIngredientList());
-        ingredientRepository.saveAll(ingredients);
+
         dish.setIngredientList(ingredients);
 
-        /*
-        List<Step> steps = new ArrayList<>();
-        for (StepDto stepDto : dishDto.getSteps()) {
-            Step step = StepMapper.toEntity(stepDto);
-            step.getDishes().add(dish);
-            steps.add(step);
-        }
-        stepRepository.saveAll(steps);
-         */
-
         List<Step> steps = DishMapper.toListStepEntity(dishDto.getSteps());
-        stepRepository.saveAll(steps);
+
         dish.setSteps(steps);
 
         dishRepository.save(dish);
 
-        DishDto finalDishDto = DishMapper.toDto(dish);
-        finalDishDto.setIngredientList(DishMapper.toListIngredientDto(dish.getIngredientList()));
-        finalDishDto.setSteps(DishMapper.toListStepDto(dish.getSteps()));
-
-        return finalDishDto;
+        return dishDto;
     }
+
+    @Override
+    public DishDto addImageToDish(Long id, MultipartFile file) {
+        Optional<Dish> dish = dishRepository.findById(id);
+        Dish realDish = null;
+
+        if (dish.isPresent()) {
+            realDish = dish.get();
+        }
+
+        try {
+            realDish.setImageName(file.getOriginalFilename());
+            realDish.setImageType(file.getContentType());
+            realDish.setImage(file.getBytes());
+            dishRepository.save(realDish);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return DishMapper.toDto(realDish);
+    }
+
 
     @Override
     public DishDto deleteDish(String name) {
@@ -98,6 +95,7 @@ public class DishServiceImpl implements DishService {
         List<DishDto> dishDtoList = new ArrayList<>();
         for (Dish dish : dishes){
             dishDto.setName(dish.getName());
+            dishDto.setImage(dish.getImage());
             dishDto.setDescription(dish.getDescription());
             dishDto.setPrepTime(dish.getPrepTime());
             dishDto.setSteps(DishMapper.toListStepDto(dish.getSteps()));
@@ -105,5 +103,17 @@ public class DishServiceImpl implements DishService {
             dishDtoList.add(dishDto);
         }
         return dishDtoList;
+    }
+
+    @Override
+    public DishDto getDishById(Long id) {
+        Optional<Dish> dish = dishRepository.findById(id);
+        DishDto dishDto = DishMapper.toDto(dish.get());
+        dishDto.setImageName(dishDto.getImageName());
+        dishDto.setImageType(dishDto.getImageType());
+        dishDto.setImage(dish.get().getImage());
+        dishDto.setIngredientList(DishMapper.toListIngredientDto(dish.get().getIngredientList()));
+        dishDto.setSteps(DishMapper.toListStepDto(dish.get().getSteps()));
+        return dishDto;
     }
 }

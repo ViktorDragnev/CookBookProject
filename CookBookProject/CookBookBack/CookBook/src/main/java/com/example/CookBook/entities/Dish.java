@@ -1,7 +1,7 @@
 package com.example.CookBook.entities;
 
+import com.example.CookBook.enums.DishType;
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +14,16 @@ public class Dish {
     private long id;
 
     private String name;
+    private DishType dishType;
     private String description;
     private String prepTime;
+    private String imageName;
+    private String imageType;
+    @Lob
+    private byte[] image;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER,
+    cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "ingredients_for_each_dish",
             joinColumns = @JoinColumn(name = "dish_id"),
@@ -25,7 +31,8 @@ public class Dish {
     )
     private List<Ingredient> ingredients = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER,
+    cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "steps_for_each_dish",
             joinColumns = @JoinColumn(name = "dish_id"),
@@ -35,8 +42,9 @@ public class Dish {
 
     public Dish() {}
 
-    public Dish(String name, String description, String prepTime) {
+    public Dish(String name, DishType dishType, String description, String prepTime) {
         this.name = name;
+        this.dishType = dishType;
         this.description = description;
         this.prepTime = prepTime;
     }
@@ -46,7 +54,7 @@ public class Dish {
     }
 
     public void setId(long id) {
-        id = id;
+        this.id = id;
     }
 
     public String getName() {
@@ -87,5 +95,37 @@ public class Dish {
 
     public void setSteps(List<Step> steps) {
         this.steps = steps;
+    }
+
+    public DishType getDishType() {
+        return dishType;
+    }
+
+    public void setDishType(DishType dishType) {
+        this.dishType = dishType;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

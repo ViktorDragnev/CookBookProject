@@ -6,7 +6,9 @@ import com.example.CookBook.dtos.StepDto;
 import com.example.CookBook.entities.Dish;
 import com.example.CookBook.entities.Ingredient;
 import com.example.CookBook.entities.Step;
+import jakarta.servlet.annotation.MultipartConfig;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +16,10 @@ import java.util.List;
 @Component
 public class DishMapper {
 
-    private Dish dish;
-    private DishDto dishDto;
-
     public static DishDto toDto(Dish dish) {
         return new DishDto(
                 dish.getName(),
+                dish.getDishType(),
                 dish.getDescription(),
                 dish.getPrepTime()
         );
@@ -28,6 +28,7 @@ public class DishMapper {
     public static Dish toEntity(DishDto dishDto) {
         return new Dish(
                 dishDto.getName(),
+                dishDto.getDishType(),
                 dishDto.getDescription(),
                 dishDto.getPrepTime()
         );

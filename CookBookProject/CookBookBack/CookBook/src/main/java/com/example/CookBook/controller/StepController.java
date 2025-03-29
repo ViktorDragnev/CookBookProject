@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "api/steps")
 public class StepController {
 
-    private StepService stepService;
+    private final StepService stepService;
 
     public StepController(StepService stepService) {
         this.stepService = stepService;
