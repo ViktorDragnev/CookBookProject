@@ -1,6 +1,7 @@
 package com.example.CookBook.controller;
 
 import com.example.CookBook.dtos.DishDto;
+import com.example.CookBook.enums.DishType;
 import com.example.CookBook.services.DishService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,5 +57,20 @@ public class DishController {
     public ResponseEntity<List<DishDto>> getAllDishes(){
         List<DishDto> dishDtoList = dishService.getDishes();
         return new ResponseEntity<>(dishDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{dishType}")
+    public ResponseEntity<List<DishDto>> getDishesByDishType(@PathVariable DishType dishType) {
+        List<DishDto> dishDtoList = dishService.displayDishesByType(dishType);
+        return new ResponseEntity<>(dishDtoList, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<?> deleteDish(@PathVariable Long id) {
+        DishDto dishDto = dishService.deleteDish(id);
+        if(dishDto == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(dishDto, HttpStatus.OK);
     }
 }

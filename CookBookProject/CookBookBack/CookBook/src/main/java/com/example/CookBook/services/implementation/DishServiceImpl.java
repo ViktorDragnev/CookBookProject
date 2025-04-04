@@ -6,6 +6,7 @@ import com.example.CookBook.dtos.StepDto;
 import com.example.CookBook.entities.Dish;
 import com.example.CookBook.entities.Ingredient;
 import com.example.CookBook.entities.Step;
+import com.example.CookBook.enums.DishType;
 import com.example.CookBook.mapper.DishMapper;
 import com.example.CookBook.mapper.IngredientMapper;
 import com.example.CookBook.mapper.StepMapper;
@@ -70,11 +71,11 @@ public class DishServiceImpl implements DishService {
 
 
     @Override
-    public DishDto deleteDish(String name) {
-        Optional<Dish> dish = dishRepository.findByName(name);
+    public DishDto deleteDish(Long id) {
+        Optional<Dish> dish = dishRepository.findById(id);
 
         if (dish.isEmpty()) {
-            throw new RuntimeException("Dish with name '" + name + "' not found.");
+            throw new RuntimeException("Dish not found.");
         }
 
         DishDto dishDto = DishMapper.toDto(dish.get());
@@ -115,5 +116,10 @@ public class DishServiceImpl implements DishService {
         dishDto.setIngredientList(DishMapper.toListIngredientDto(dish.get().getIngredientList()));
         dishDto.setSteps(DishMapper.toListStepDto(dish.get().getSteps()));
         return dishDto;
+    }
+
+    @Override
+    public List<DishDto> displayDishesByType(DishType dishType) {
+        return dishRepository.findByDishType(dishType);
     }
 }
