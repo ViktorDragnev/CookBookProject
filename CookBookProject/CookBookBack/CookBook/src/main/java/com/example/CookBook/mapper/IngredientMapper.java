@@ -1,11 +1,8 @@
 package com.example.CookBook.mapper;
 
-import com.example.CookBook.dtos.IngredientDto;
+import com.example.CookBook.dtos.responses.IngredientDto;
 import com.example.CookBook.entities.Ingredient;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class IngredientMapper {

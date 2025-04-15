@@ -1,9 +1,7 @@
 package com.example.CookBook.controller;
 
-import com.example.CookBook.dtos.StepDto;
-import com.example.CookBook.entities.Step;
+import com.example.CookBook.dtos.responses.StepDto;
 import com.example.CookBook.services.StepService;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

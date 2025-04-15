@@ -1,15 +1,11 @@
 package com.example.CookBook.mapper;
 
-import com.example.CookBook.dtos.UserDto;
-import com.example.CookBook.entities.User;
+import com.example.CookBook.dtos.responses.UserDto;
+import com.example.CookBook.entities.UserEntity;
 
 public class UserMapper {
 
-    public static User mapToEntity(UserDto userDto) {
-        return new User(userDto.getUsername(), userDto.getPassword(), userDto.getEmail());
-    }
-
-    public static UserDto mapToDto(User user) {
-        return new UserDto(user.getUsername(), user.getPassword(), user.getEmail());
+    public static UserDto mapToDto(UserEntity userEntity) {
+        return new UserDto(userEntity.getUsername());
     }
 }

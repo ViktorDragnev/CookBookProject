@@ -1,4 +1,4 @@
-package com.example.CookBook.dtos;
+package com.example.CookBook.dtos.responses;
 
 public class IngredientDto {
     String name;

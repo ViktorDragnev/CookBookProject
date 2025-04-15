@@ -12,4 +12,6 @@ public class IngredientServiceImpl implements IngredientService {
     public IngredientServiceImpl(IngredientRepository ingredientRepository) {
         this.ingredientRepository = ingredientRepository;
     }
+
+
 }

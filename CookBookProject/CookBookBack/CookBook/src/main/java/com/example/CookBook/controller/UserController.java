@@ -1,13 +1,11 @@
 package com.example.CookBook.controller;
 
-import com.example.CookBook.dtos.UserDto;
+import com.example.CookBook.dtos.responses.UserDto;
+import com.example.CookBook.dtos.responses.UserProfileDto;
 import com.example.CookBook.services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "api/user")
@@ -20,7 +18,13 @@ public class UserController {
     }
 
     @GetMapping
-    public UserDto getUserByEmail(@RequestParam String email) {
-        return userService.getUserByEmail(email);
+    public UserDto getUserByUsername(@RequestParam String username) {
+        return userService.getUserByUsername(username);
+    }
+
+    @GetMapping(path = "/{username}")
+    public ResponseEntity<UserProfileDto> getUserById(@PathVariable String username) {
+        UserProfileDto userProfileDto = userService.getUserProfile(username);
+        return new ResponseEntity<>(userProfileDto, HttpStatus.OK);
     }
 }

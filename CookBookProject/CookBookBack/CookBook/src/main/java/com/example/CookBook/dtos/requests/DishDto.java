@@ -1,5 +1,8 @@
-package com.example.CookBook.dtos;
+package com.example.CookBook.dtos.requests;
 
+import com.example.CookBook.dtos.responses.IngredientDto;
+import com.example.CookBook.dtos.responses.StepDto;
+import com.example.CookBook.dtos.responses.UserDto;
 import com.example.CookBook.enums.DishType;
 
 import java.util.ArrayList;
@@ -7,6 +10,7 @@ import java.util.List;
 
 public class DishDto {
     String name;
+    UserDto user;
     DishType dishType;
     String description;
     String prepTime;
@@ -32,6 +36,14 @@ public class DishDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public UserDto getUser() {
+        return user;
+    }
+
+    public void setUser(UserDto user) {
+        this.user = user;
     }
 
     public List<IngredientDto> getIngredientList() {

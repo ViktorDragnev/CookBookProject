@@ -1,6 +1,6 @@
 package com.example.CookBook.services.implementation;
 
-import com.example.CookBook.dtos.StepDto;
+import com.example.CookBook.dtos.responses.StepDto;
 import com.example.CookBook.mapper.StepMapper;
 import com.example.CookBook.repositories.StepRepository;
 import com.example.CookBook.services.StepService;

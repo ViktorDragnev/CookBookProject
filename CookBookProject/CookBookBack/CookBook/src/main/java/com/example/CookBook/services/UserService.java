@@ -1,11 +1,11 @@
 package com.example.CookBook.services;
 
-import com.example.CookBook.dtos.UserDto;
-import com.example.CookBook.entities.User;
+import com.example.CookBook.dtos.responses.UserDto;
+import com.example.CookBook.dtos.responses.UserProfileDto;
 
 public interface UserService {
 
-    UserDto createUser(UserDto user);
+    UserDto getUserByUsername(String username);
 
-    UserDto getUserByEmail(String email);
+    UserProfileDto getUserProfile(String username);
 }

@@ -4,5 +4,5 @@ public enum DishType {
     APPETIZER,
     SALAD,
     MAIN_COURSE,
-    DESSERT,
+    DESSERT
 }

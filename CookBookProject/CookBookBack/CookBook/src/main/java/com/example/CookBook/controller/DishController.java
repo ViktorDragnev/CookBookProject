@@ -1,7 +1,14 @@
 package com.example.CookBook.controller;
 
-import com.example.CookBook.dtos.DishDto;
+import com.example.CookBook.dtos.requests.DishDto;
+import com.example.CookBook.dtos.responses.IngredientDto;
+import com.example.CookBook.entities.Dish;
 import com.example.CookBook.enums.DishType;
+import com.example.CookBook.exceptions.UnauthorizedException;
+import com.example.CookBook.mapper.DishMapper;
+import com.example.CookBook.repositories.DishRepository;
+import com.example.CookBook.repositories.UserRepository;
+import com.example.CookBook.security.JWTGenerator;
 import com.example.CookBook.services.DishService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -9,44 +16,95 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "api/dishes")
 public class DishController {
 
     private final DishService dishService;
+    private final UserRepository userRepository;
+    private final DishRepository dishRepository;
 
-    public DishController(DishService dishService) {
+    public DishController(DishService dishService, UserRepository userRepository, DishRepository dishRepository) {
         this.dishService = dishService;
+        this.userRepository = userRepository;
+        this.dishRepository = dishRepository;
     }
 
-    @PostMapping(path = "/addDish")
-    public ResponseEntity<?> addDish(@RequestPart DishDto dishDto) {
-        DishDto dish = dishService.addDish(dishDto);
-        return new ResponseEntity<>(dish, HttpStatus.CREATED);
-    }
+    @PostMapping("/add")
+    public ResponseEntity<?> addDish(
+            @RequestBody DishDto dishDto,
+            @RequestHeader("Authorization") String token) {
 
-    @PutMapping(path = "/addDish/{id}")
-    public ResponseEntity<?> updateDish(@RequestPart MultipartFile image, @PathVariable Long id) {
+        String jwt = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = JWTGenerator.getUsernameFromJWT(jwt);
+
+        if(dishService.dishNameExists(dishDto.getName())) {
+            return new ResponseEntity<>("Dish exists!",HttpStatus.CONFLICT);
+        }
+
         try {
-            DishDto dishDto = dishService.addImageToDish(id, image);
-            return new ResponseEntity<>(dishDto, HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.I_AM_A_TEAPOT);
+            DishDto savedDishDto = dishService.addDish(dishDto, username);
+            return new ResponseEntity<>(savedDishDto, HttpStatus.CREATED);
+        } catch (UnauthorizedException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DishDto> getDishById(@PathVariable Long id) {
-        return new ResponseEntity<>(dishService.getDishById(id), HttpStatus.OK);
+    @PostMapping("/add/noAuth")
+    public ResponseEntity<?> addDishNoAuth(
+            @RequestBody DishDto dishDto) {
+
+        if(dishService.dishNameExists(dishDto.getName())) {
+            return new ResponseEntity<>("Dish exists!",HttpStatus.CONFLICT);
+        }
+
+        try {
+            DishDto savedDishDto = dishService.addDishNoAuth(dishDto);
+            return new ResponseEntity<>(savedDishDto, HttpStatus.CREATED);
+        } catch (UnauthorizedException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
-    @GetMapping("/{id}/image")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
-        DishDto dish = dishService.getDishById(id);
+    @PatchMapping("/{name}/image")
+    public ResponseEntity<DishDto> updateDishImage(
+            @PathVariable String name,
+            @RequestParam("image") MultipartFile image) {
+
+        try {
+            DishDto updatedDish = dishService.addImageToDish(name, image);
+            return ResponseEntity.ok(updatedDish);
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to process image",
+                    e
+            );
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    e.getMessage(),
+                    e
+            );
+        }
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<DishDto> getDishByName(@PathVariable String name) {
+        return new ResponseEntity<>(dishService.getDishByName(name), HttpStatus.OK);
+    }
+
+    @GetMapping("/{name}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable String name) {
+        DishDto dish = dishService.getDishByName(name);
         byte[] image = dish.getImage();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.valueOf(dish.getImageType()));
@@ -59,18 +117,30 @@ public class DishController {
         return new ResponseEntity<>(dishDtoList, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{dishType}")
+    @GetMapping(path = "/type/{dishType}")
     public ResponseEntity<List<DishDto>> getDishesByDishType(@PathVariable DishType dishType) {
         List<DishDto> dishDtoList = dishService.displayDishesByType(dishType);
         return new ResponseEntity<>(dishDtoList, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> deleteDish(@PathVariable Long id) {
-        DishDto dishDto = dishService.deleteDish(id);
-        if(dishDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @DeleteMapping(path = "/{dishId}")
+    public ResponseEntity<?> deleteDish(@PathVariable Long dishId, @RequestHeader("Authorization") String token) {
+        String jwt = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = JWTGenerator.getUsernameFromJWT(jwt);
+
+        try {
+            dishService.deleteDish(dishId, username);
+            return ResponseEntity.ok("Dish deleted successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
-        return new ResponseEntity<>(dishDto, HttpStatus.OK);
     }
+
+    @GetMapping(path = "/filterByIngredients")
+    public ResponseEntity<List<DishDto>> filterRecipesByIngredients(@RequestParam List<String> ingredients) {
+        return new ResponseEntity<>(dishService.findDishesContainingAnyIngredient(ingredients), HttpStatus.OK);
+    }
+
 }

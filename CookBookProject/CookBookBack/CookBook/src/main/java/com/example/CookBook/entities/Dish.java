@@ -12,7 +12,12 @@ public class Dish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
+    @ManyToOne
+    @JoinTable(
+            name = "user_dishes",
+            joinColumns = @JoinColumn(name = "dish_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private UserEntity user;
     private String name;
     private DishType dishType;
     private String description;
@@ -63,6 +68,14 @@ public class Dish {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     public List<Ingredient> getIngredientList() {

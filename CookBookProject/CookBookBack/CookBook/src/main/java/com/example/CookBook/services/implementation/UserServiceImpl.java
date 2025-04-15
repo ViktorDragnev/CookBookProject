@@ -1,7 +1,9 @@
 package com.example.CookBook.services.implementation;
 
-import com.example.CookBook.dtos.UserDto;
-import com.example.CookBook.entities.User;
+import com.example.CookBook.dtos.responses.UserProfileDto;
+import com.example.CookBook.dtos.responses.UserDto;
+import com.example.CookBook.entities.UserEntity;
+import com.example.CookBook.mapper.DishMapper;
 import com.example.CookBook.mapper.UserMapper;
 import com.example.CookBook.repositories.UserRepository;
 import com.example.CookBook.services.UserService;
@@ -19,16 +21,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        User user = UserMapper.mapToEntity(userDto);
-        userRepository.save(user);
-        return userDto;
+    public UserDto getUserByUsername(String username) {
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+
+        return user.map(UserMapper::mapToDto).orElse(null);
     }
 
     @Override
-    public UserDto getUserByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
+    public UserProfileDto getUserProfile(String username) {
+        Optional<UserEntity> user = userRepository.findByUsername(username);
 
-        return user.map(UserMapper::mapToDto).orElse(null);
+        return user.map(userEntity -> new UserProfileDto(
+                userEntity.getUsername(),
+                DishMapper.toListSimpleDishEntity(userEntity.getDishes()))).orElse(null);
     }
 }
