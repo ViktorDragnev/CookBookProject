@@ -44,11 +44,11 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
           categories={categories} 
         />
         <SearchButton />
+        <PostButton />
+
       </div>
 
-      <PostButton />
-
-      {/* <AuthButtons /> */}
+      <AuthButtons />
 </nav>
   );
 };
