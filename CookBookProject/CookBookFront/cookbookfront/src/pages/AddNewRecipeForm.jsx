@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import BackButton from "../components/BackButton";
 
 const SubmitRecipe = ({ onRecipeAdded }) => {
   const [formData, setFormData] = useState({
@@ -58,7 +59,7 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
         steps: formData.steps
       };
 
-      const response = await axios.post("http://localhost:8090/api/dishes/add/noAuth", recipeData);
+      const response = await axios.post("http://localhost:8090/api/dishes/add", recipeData);
       
       if (formData.image) {
         const formDataImg = new FormData();
@@ -94,6 +95,7 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
+        <BackButton />
         <h1 style={styles.title}>Share Your Recipe</h1>
         <p style={styles.subtitle}>Fill in the details to add your culinary creation</p>
 

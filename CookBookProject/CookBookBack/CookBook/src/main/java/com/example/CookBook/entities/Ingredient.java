@@ -13,8 +13,9 @@ public class Ingredient {
 
     private String name;
 
-    @ManyToMany(mappedBy = "ingredients")
-    private List<Dish> dishes = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "dish_id")
+    private Dish dish;
 
     public Ingredient() {}
 
@@ -38,11 +39,11 @@ public class Ingredient {
         this.name = name;
     }
 
-    public List<Dish> getDishes() {
-        return dishes;
+    public Dish getDish() {
+        return dish;
     }
 
-    public void setDishes(List<Dish> dishes) {
-        this.dishes = dishes;
+    public void setDish(Dish dish) {
+        this.dish = dish;
     }
 }

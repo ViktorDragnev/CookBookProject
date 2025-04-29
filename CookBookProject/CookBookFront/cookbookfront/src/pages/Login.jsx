@@ -9,21 +9,24 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
     try {
       const response = await axios.post('http://localhost:8090/api/auth/login', {
         username,
         password,
       });
-      const token = response.data.token;
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('username', username);
+
+      const token = response.data.accessToken;
+      sessionStorage.setItem('authToken', token);
+      sessionStorage.setItem('loggedInUser', username);
       alert('Login successful!');
+      window.location.reload();
+      window.location.href = '/';
     } catch (err) {
       setError('Invalid username or password. Please try again.');
     }
   };
   
-
   return (
     <div
       style={{

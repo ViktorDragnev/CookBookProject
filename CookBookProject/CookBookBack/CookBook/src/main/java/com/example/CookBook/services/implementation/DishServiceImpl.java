@@ -1,7 +1,6 @@
 package com.example.CookBook.services.implementation;
 
 import com.example.CookBook.dtos.requests.DishDto;
-import com.example.CookBook.dtos.responses.IngredientDto;
 import com.example.CookBook.entities.Dish;
 import com.example.CookBook.entities.Ingredient;
 import com.example.CookBook.entities.UserEntity;
@@ -12,6 +11,7 @@ import com.example.CookBook.repositories.DishRepository;
 import com.example.CookBook.repositories.UserRepository;
 import com.example.CookBook.services.DishService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -81,20 +81,26 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public DishDto deleteDish(Long dishId, String username) {
-        Optional<Dish> dish = dishRepository.findById(dishId);
+    public DishDto deleteDish(String dishName, String username) {
+        Optional<Dish> dish = dishRepository.findByName(dishName);
 
         if(dish.isPresent()) {
             Dish realDish = dish.get();
             if(!realDish.getUser().getUsername().equals(username)) {
                 throw new IllegalArgumentException("You are not the owner of this recipe.");
             }
-            DishDto dishDto = DishMapper.toDto(dish.get());
             dishRepository.delete(realDish);
-            return dishDto;
+            return DishMapper.toDto(dish.get());
         } else {
             throw new IllegalArgumentException("Recipe not found.");
         }
+    }
+
+    @Override
+    public DishDto deleteDishTest(String dishName) {
+        Dish dish = dishRepository.findByName(dishName).get();
+        dishRepository.delete(dish);
+        return DishMapper.toDto(dish);
     }
 
 
@@ -133,7 +139,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public List<DishDto> findDishesContainingAnyIngredient(List<String> ingredients) {
+    public List<DishDto> findDishesContainingMatchingIngredient(List<String> ingredients) {
         List<Dish> dishes = dishRepository.findAll();
         List<DishDto> dishDtos = new ArrayList<>();
 

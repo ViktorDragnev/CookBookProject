@@ -13,10 +13,6 @@ public class Dish {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @ManyToOne
-    @JoinTable(
-            name = "user_dishes",
-            joinColumns = @JoinColumn(name = "dish_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private UserEntity user;
     private String name;
     private DishType dishType;
@@ -26,23 +22,9 @@ public class Dish {
     private String imageType;
     @Lob
     private byte[] image;
-
-    @ManyToMany(fetch = FetchType.EAGER,
-    cascade = CascadeType.PERSIST)
-    @JoinTable(
-            name = "ingredients_for_each_dish",
-            joinColumns = @JoinColumn(name = "dish_id"),
-            inverseJoinColumns = @JoinColumn(name = "ingredient_id")
-    )
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Ingredient> ingredients = new ArrayList<>();
-
-    @ManyToMany(fetch = FetchType.EAGER,
-    cascade = CascadeType.PERSIST)
-    @JoinTable(
-            name = "steps_for_each_dish",
-            joinColumns = @JoinColumn(name = "dish_id"),
-            inverseJoinColumns = @JoinColumn(name = "step_id")
-    )
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Step> steps = new ArrayList<>();
 
     public Dish() {}

@@ -4,7 +4,7 @@ import RecipesList from "./components/RecipesList";
 import RecipeDetail from "./components/RecipeDetail";
 import SearchByIngredients from "./components/SearchByIngredients";
 import Navbar from "./components/Navbar";
-import PostButton from "./components/PostButton";
+import Profile from "./pages/Profile";	
 import Login from "./pages/Login";
 import Signup from "./pages/SignUp";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -113,6 +113,9 @@ const App = () => {
 
             {/* Signup Page */}
             <Route path="/signup" element={<Signup />} />
+
+            {/* Profile Page */}
+            <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </main>

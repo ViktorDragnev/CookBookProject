@@ -1,8 +1,6 @@
 package com.example.CookBook.entities;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "steps")
@@ -13,8 +11,9 @@ public class Step {
 
     private String step;
 
-    @ManyToMany(mappedBy = "steps")
-    private List<Dish> dishes = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "dish_id")
+    private Dish dish;
 
     public Step() {}
 
@@ -38,11 +37,11 @@ public class Step {
         this.step = step;
     }
 
-    public List<Dish> getDishes() {
-        return dishes;
+    public Dish getDish() {
+        return dish;
     }
 
-    public void setDishes(List<Dish> dishes) {
-        this.dishes = dishes;
+    public void setDish(Dish dish) {
+        this.dish = dish;
     }
 }

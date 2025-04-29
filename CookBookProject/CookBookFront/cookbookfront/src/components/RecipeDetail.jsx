@@ -4,7 +4,7 @@ import axios from 'axios';
 import BackButton from './BackButton';
 
 const RecipeDetail = () => {
-    const { name } = useParams();
+    const {name} = useParams();
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
     const [imageSrc, setImageSrc] = useState(null);
@@ -30,6 +30,13 @@ const RecipeDetail = () => {
 
     fetchRecipe();
   }, [name]);
+
+  const categoryMapping = {
+    "MAIN_COURSE": "Main Courses",
+    "SALAD": "Salads",
+    "APPETIZER": "Starters",
+    "DESSERT": "Desserts"
+  };
 
   if (loading) return <div>Loading...</div>;
 
@@ -57,7 +64,7 @@ const RecipeDetail = () => {
       <p><strong>Creator:</strong> {recipe.user.username || 'N/A'}</p>
       <p><strong>Description:</strong> {recipe.description || 'N/A'}</p>
       <p><strong>Prep Time:</strong> {recipe.prepTime || 'N/A'}</p>
-      <p><strong>Category:</strong> {recipe.dishType || 'N/A'}</p>
+      <p><strong>Category:</strong> {categoryMapping[recipe.dishType] || recipe.dishType || 'N/A'}</p>
       <div>
             <h2>Ingredients</h2>
                 <ul>

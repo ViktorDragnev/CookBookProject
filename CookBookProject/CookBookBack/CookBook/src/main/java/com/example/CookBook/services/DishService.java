@@ -1,7 +1,6 @@
 package com.example.CookBook.services;
 
 import com.example.CookBook.dtos.requests.DishDto;
-import com.example.CookBook.dtos.responses.IngredientDto;
 import com.example.CookBook.enums.DishType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +15,9 @@ public interface DishService {
 
     DishDto addImageToDish(String name, MultipartFile file) throws IOException;
 
-    DishDto deleteDish(Long dishId, String email);
+    DishDto deleteDish(String dishName, String email);
+
+    DishDto deleteDishTest(String dishName);
 
     List<DishDto> getDishes();
 
@@ -26,5 +27,5 @@ public interface DishService {
 
     boolean dishNameExists(String name);
 
-    List<DishDto> findDishesContainingAnyIngredient(List<String> ingredientDtoList);
+    List<DishDto> findDishesContainingMatchingIngredient(List<String> ingredientDtoList);
 }

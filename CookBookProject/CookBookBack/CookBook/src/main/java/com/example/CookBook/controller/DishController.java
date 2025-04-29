@@ -1,11 +1,8 @@
 package com.example.CookBook.controller;
 
 import com.example.CookBook.dtos.requests.DishDto;
-import com.example.CookBook.dtos.responses.IngredientDto;
-import com.example.CookBook.entities.Dish;
 import com.example.CookBook.enums.DishType;
 import com.example.CookBook.exceptions.UnauthorizedException;
-import com.example.CookBook.mapper.DishMapper;
 import com.example.CookBook.repositories.DishRepository;
 import com.example.CookBook.repositories.UserRepository;
 import com.example.CookBook.security.JWTGenerator;
@@ -19,9 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "api/dishes")
@@ -123,13 +118,13 @@ public class DishController {
         return new ResponseEntity<>(dishDtoList, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/{dishId}")
-    public ResponseEntity<?> deleteDish(@PathVariable Long dishId, @RequestHeader("Authorization") String token) {
+    @DeleteMapping(path = "/{dishName}")
+    public ResponseEntity<?> deleteDish(@PathVariable String dishName, @RequestHeader("Authorization") String token) {
         String jwt = token.startsWith("Bearer ") ? token.substring(7) : token;
         String username = JWTGenerator.getUsernameFromJWT(jwt);
 
         try {
-            dishService.deleteDish(dishId, username);
+            dishService.deleteDish(dishName, username);
             return ResponseEntity.ok("Dish deleted successfully.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
@@ -138,9 +133,15 @@ public class DishController {
         }
     }
 
+    @DeleteMapping(path = "/test/{dishName}")
+    public ResponseEntity<?> deleteDishTest(@PathVariable String dishName) {
+        DishDto dishDto = dishService.deleteDishTest(dishName);
+        return new ResponseEntity<>(dishDto, HttpStatus.OK);
+    }
+
     @GetMapping(path = "/filterByIngredients")
     public ResponseEntity<List<DishDto>> filterRecipesByIngredients(@RequestParam List<String> ingredients) {
-        return new ResponseEntity<>(dishService.findDishesContainingAnyIngredient(ingredients), HttpStatus.OK);
+        return new ResponseEntity<>(dishService.findDishesContainingMatchingIngredient(ingredients), HttpStatus.OK);
     }
 
 }
