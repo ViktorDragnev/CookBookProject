@@ -40,7 +40,7 @@ const Profile = () => {
   };
 
   const handleDelete = async (recipeName) => {
-    const token = localStorage.getItem("authToken"); // Ensure this is stored during login
+    const token = sessionStorage.getItem("authToken");
   
     if (!token) {
       console.error("No authentication token found!");

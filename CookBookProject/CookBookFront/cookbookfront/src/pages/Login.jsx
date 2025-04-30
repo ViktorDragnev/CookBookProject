@@ -19,6 +19,8 @@ const Login = () => {
       const token = response.data.accessToken;
       sessionStorage.setItem('authToken', token);
       sessionStorage.setItem('loggedInUser', username);
+      const storedToken = sessionStorage.getItem('authToken');
+      console.log('Token stored in sessionStorage:', storedToken);
       alert('Login successful!');
       window.location.reload();
       window.location.href = '/';

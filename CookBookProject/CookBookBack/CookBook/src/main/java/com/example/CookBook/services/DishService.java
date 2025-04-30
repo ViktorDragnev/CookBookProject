@@ -11,11 +11,9 @@ public interface DishService {
 
     DishDto addDish(DishDto dishDto, String token);
 
-    DishDto addDishNoAuth(DishDto dishDto);
-
     DishDto addImageToDish(String name, MultipartFile file) throws IOException;
 
-    DishDto deleteDish(String dishName, String email);
+    void deleteDish(String dishName, String email);
 
     DishDto deleteDishTest(String dishName);
 
@@ -28,4 +26,6 @@ public interface DishService {
     boolean dishNameExists(String name);
 
     List<DishDto> findDishesContainingMatchingIngredient(List<String> ingredientDtoList);
+
+    List<DishDto> findDishesByName(String name);
 }

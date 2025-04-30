@@ -39,10 +39,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/**").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/api/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").authenticated()
                         .anyRequest().permitAll())
                 .httpBasic(withDefaults());
 

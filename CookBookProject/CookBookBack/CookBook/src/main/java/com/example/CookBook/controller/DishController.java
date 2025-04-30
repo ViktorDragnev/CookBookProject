@@ -52,22 +52,6 @@ public class DishController {
         }
     }
 
-    @PostMapping("/add/noAuth")
-    public ResponseEntity<?> addDishNoAuth(
-            @RequestBody DishDto dishDto) {
-
-        if(dishService.dishNameExists(dishDto.getName())) {
-            return new ResponseEntity<>("Dish exists!",HttpStatus.CONFLICT);
-        }
-
-        try {
-            DishDto savedDishDto = dishService.addDishNoAuth(dishDto);
-            return new ResponseEntity<>(savedDishDto, HttpStatus.CREATED);
-        } catch (UnauthorizedException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
-
     @PatchMapping("/{name}/image")
     public ResponseEntity<DishDto> updateDishImage(
             @PathVariable String name,
@@ -142,6 +126,11 @@ public class DishController {
     @GetMapping(path = "/filterByIngredients")
     public ResponseEntity<List<DishDto>> filterRecipesByIngredients(@RequestParam List<String> ingredients) {
         return new ResponseEntity<>(dishService.findDishesContainingMatchingIngredient(ingredients), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/searchByName/{name}")
+    public ResponseEntity<List<DishDto>> searchByName(@PathVariable String name) {
+        return new ResponseEntity<>(dishService.findDishesByName(name), HttpStatus.OK);
     }
 
 }

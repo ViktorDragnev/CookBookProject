@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/SignUp";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SubmitRecipe from "./pages/AddNewRecipeForm";
+import SearchResults from "./components/SearchResults";
 
 const App = () => {
   const [recipes, setRecipes] = useState([]);
@@ -116,6 +117,9 @@ const App = () => {
 
             {/* Profile Page */}
             <Route path="/profile" element={<Profile />} />
+
+            {/* Search Results Page */}
+            <Route path="/search-results" element={<SearchResults />} />
         </Routes>
       </div>
     </main>

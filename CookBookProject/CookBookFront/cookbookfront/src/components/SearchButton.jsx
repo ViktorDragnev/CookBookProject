@@ -18,7 +18,7 @@ const SearchButton = () => (
         cursor: "pointer",
       }}
     >
-      Search Ingredients
+      Advanced Search
     </button>
   </Link>
 );

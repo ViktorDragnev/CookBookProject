@@ -48,9 +48,20 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    const token = sessionStorage.getItem('authToken');
+  
+    if (!token) {
+      setError("Please log in to add a recipe");
+      setIsSubmitting(false);
+      return;
+    }
     
+
+    console.log('Token from sessionStorage:', token);
+
     try {
-      const recipeData = {
+      const dishData = {
         name: formData.name,
         description: formData.description,
         dishType: formData.dishType,
@@ -59,14 +70,29 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
         steps: formData.steps
       };
 
-      const response = await axios.post("http://localhost:8090/api/dishes/add", recipeData);
+      const axiosInstance = axios.create({
+        headers: {
+          'Authorization': token
+        }
+      });
+  
+      console.log('Making request with headers:', axiosInstance.defaults.headers);
+      console.log('Recipe data:', dishData);
+
+      const response = await axios.post('http://localhost:8090/api/dishes/add', dishData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Dish added:', response.data);
       
       if (formData.image) {
         const formDataImg = new FormData();
         formDataImg.append("image", formData.image);
         await axios.patch(
-          `http://localhost:8090/api/dishes/${response.data.name}/image`,
-          formDataImg
+          `http://localhost:8090/api/dishes/${response.data.name}/image`, formDataImg,
         );
       }
 

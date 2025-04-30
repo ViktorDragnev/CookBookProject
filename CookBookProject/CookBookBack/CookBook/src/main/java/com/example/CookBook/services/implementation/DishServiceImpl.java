@@ -11,7 +11,6 @@ import com.example.CookBook.repositories.DishRepository;
 import com.example.CookBook.repositories.UserRepository;
 import com.example.CookBook.services.DishService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -45,21 +44,6 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public DishDto addDishNoAuth(DishDto dishDto) {
-        if(dishRepository.existsByName(dishDto.getName())) {
-            throw new IllegalArgumentException("Dish name already exists");
-        }
-        Optional<UserEntity> entity = userRepository.findByUsername("test1");
-        Dish dish = DishMapper.toEntity(dishDto);
-
-        dish.setUser(entity.get());
-        dish.setIngredientList(DishMapper.toListIngredientEntity(dishDto.getIngredientList()));
-        dish.setSteps(DishMapper.toListStepEntity(dishDto.getSteps()));
-        dishRepository.save(dish);
-        return dishDto;
-    }
-
-    @Override
     public DishDto addImageToDish(String name, MultipartFile file) {
         Optional<Dish> dish = dishRepository.findByName(name);
         Dish realDish = null;
@@ -81,7 +65,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public DishDto deleteDish(String dishName, String username) {
+    public void deleteDish(String dishName, String username) {
         Optional<Dish> dish = dishRepository.findByName(dishName);
 
         if(dish.isPresent()) {
@@ -90,7 +74,7 @@ public class DishServiceImpl implements DishService {
                 throw new IllegalArgumentException("You are not the owner of this recipe.");
             }
             dishRepository.delete(realDish);
-            return DishMapper.toDto(dish.get());
+            DishMapper.toDto(dish.get());
         } else {
             throw new IllegalArgumentException("Recipe not found.");
         }
@@ -154,6 +138,17 @@ public class DishServiceImpl implements DishService {
         }
 
         return dishDtos;
+    }
+
+    @Override
+    public List<DishDto> findDishesByName(String name) {
+        List<Dish> dishes = dishRepository.findByNameContainingIgnoreCase(name);
+
+        if (dishes.isEmpty()) {
+            throw new IllegalArgumentException("No dishes found with name containing: " + name);
+        }
+
+        return DishMapper.toListDishDto(dishes);
     }
 
 }
