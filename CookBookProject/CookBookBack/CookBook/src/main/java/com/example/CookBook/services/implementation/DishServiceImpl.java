@@ -99,21 +99,13 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public DishDto getDishByName(String name) {
-        Optional<Dish> dish = dishRepository.findByName(name);
-        DishDto dishDto = DishMapper.toDto(dish.get());
-        dishDto.setUser(UserMapper.mapToDto(dish.get().getUser()));
-        dishDto.setImageName(dish.get().getImageName());
-        dishDto.setImageType(dish.get().getImageType());
-        dishDto.setImage(dish.get().getImage());
-        dishDto.setIngredientList(DishMapper.toListIngredientDto(dish.get().getIngredientList()));
-        dishDto.setSteps(DishMapper.toListStepDto(dish.get().getSteps()));
-        return dishDto;
+        Dish dish = dishRepository.findByName(name).get();
+        return DishMapper.toCompleteDto(dish);
     }
 
     @Override
     public List<DishDto> displayDishesByType(DishType dishType) {
         List<Dish> dishes = dishRepository.findAllByDishType(dishType);
-
         return DishMapper.toListDishDto(dishes);
     }
 
@@ -151,4 +143,64 @@ public class DishServiceImpl implements DishService {
         return DishMapper.toListDishDto(dishes);
     }
 
+    @Override
+    public void updateDish(String dishName, DishDto dishDto, String username) {
+        Dish dish = dishRepository.findByName(dishName).get();
+
+        boolean isUpdated = false;
+
+        if(!dish.getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException("You are not the owner of this recipe.");
+        }
+
+        if (dishDto.getName() != null && !dishDto.getName().isBlank()) {
+            dish.setName(dishDto.getName());
+            isUpdated = true;
+        }
+
+        if (dishDto.getDishType() != null) {
+            dish.setDishType(dishDto.getDishType());
+            isUpdated = true;
+        }
+
+        if (dishDto.getDescription() != null && !dishDto.getDescription().isBlank()) {
+            dish.setDescription(dishDto.getDescription());
+            isUpdated = true;
+        }
+
+        if (dishDto.getPrepTime() != null) {
+            dish.setPrepTime(dishDto.getPrepTime());
+            isUpdated = true;
+        }
+
+        if (dishDto.getIngredientList() != null && !dishDto.getIngredientList().isEmpty()) {
+            dish.setIngredientList(DishMapper.toListIngredientEntity(dishDto.getIngredientList()));
+            isUpdated = true;
+        }
+
+        if (dishDto.getSteps() != null && !dishDto.getSteps().isEmpty()) {
+            dish.setSteps(DishMapper.toListStepEntity(dishDto.getSteps()));
+            isUpdated = true;
+        }
+
+        if (isUpdated) {
+            dishRepository.save(dish);
+        }
+    }
+
+    @Override
+    public void updateDishImage(String dishName, MultipartFile file, String username) throws IOException {
+        Dish dish = dishRepository.findByName(dishName).get();
+
+        if(!dish.getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException("You are not the owner of this recipe.");
+        }
+
+        if(!file.isEmpty() || file.getSize() != 0) {
+            dish.setImage(file.getBytes());
+            dish.setImageName(file.getOriginalFilename());
+            dish.setImageType(file.getContentType());
+            dishRepository.save(dish);
+        }
+    }
 }

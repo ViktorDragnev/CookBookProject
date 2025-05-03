@@ -42,7 +42,8 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
     window.location.reload();
 
     if (
-      window.location.pathname === "/profile" ||
+      window.location.pathname === "/accountRecipes" ||
+      window.location.pathname === "/accountSettings" ||
       window.location.pathname === "/addRecipe"
     ) {
       window.location.href = "/";
@@ -73,18 +74,10 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
         top: 0,
         left: 0,
         zIndex: 1000,
-        boxSizing: "border-box",
+        boxSizing: "border-box"
       }}
     >
       <Logo />
-
-      <div style={{ position: "relative", marginRight: "10px" }}>
-        <MenuButton
-          activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
-          categories={categories}
-        />
-      </div>
 
       <form
         onSubmit={handleSearch}
@@ -92,7 +85,7 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
           display: "flex",
           gap: "10px",
           flex: "0 1 250px",
-          maxWidth: "250px",
+          maxWidth: "250px"
         }}
       >
         <input
@@ -107,7 +100,7 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
             padding: "8px 12px",
             borderRadius: "4px",
             border: "1px solid #ccc",
-            fontSize: "0.9rem",
+            fontSize: "0.9rem"
           }}
         />
         <button
@@ -120,6 +113,8 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            marginLeft: "-10px",
+            marginRight: "40px"
           }}
         >
           <svg
@@ -134,6 +129,16 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
           </svg>
         </button>
       </form>
+  
+      <div style={{ position: "relative", marginRight: "10px" }}>
+        <MenuButton
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+          categories={categories}
+        />
+      </div>
+  
+      <SearchButton />
 
       <div
         style={{
@@ -141,11 +146,9 @@ const Navbar = ({ activeCategory, setActiveCategory }) => {
           justifyContent: "center",
           alignItems: "center",
           gap: "20px",
-          flex: "1",
+          flex: "1"
         }}
       >
-        <SearchButton />
-        <PostButton />
       </div>
 
       <div style={{ position: "relative" }}>

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Logo = () => (
   <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
     <img 
-      src="/recipe-hub-high-resolution-logo.png"
+      src="/Preview.png"
       alt="Recipe App Logo"
       style={{
         height: '60px',

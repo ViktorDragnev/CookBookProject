@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import RecipesList from './RecipesList';
-import BackButton from './BackButton';
 
 const SearchResults = () => {
   const [searchResults, setSearchResults] = useState([]);
@@ -32,7 +31,7 @@ const SearchResults = () => {
         display: "flex", 
         justifyContent: "center", 
         alignItems: "center",
-        minHeight: "calc(100vh - 90px)",
+        minHeight: "calc(100vh - 60px)",
         color: "black" 
       }}>
         Loading...
@@ -42,25 +41,15 @@ const SearchResults = () => {
 
   return (
     <div style={{ 
-      padding: "20px",
       maxWidth: "1200px",
       margin: "0 auto",
       display: "flex",
       flexDirection: "column",
       alignItems: "center"
     }}>
-      <div style={{
-        width: "100%",
-        display: "flex",
-        justifyContent: "flex-start",
-        marginBottom: "20px"
-      }}>
-        <BackButton />
-      </div>
       
       <h2 style={{ 
         color: "black", 
-        marginBottom: "20px",
         textAlign: "center"
       }}>
         Search Results
@@ -70,7 +59,6 @@ const SearchResults = () => {
         <>
           <p style={{ 
             color: "black", 
-            marginBottom: "20px",
             textAlign: "center"
           }}>
             Found {searchResults.length} recipe(s)

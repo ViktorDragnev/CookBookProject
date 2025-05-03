@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import BackButton from "../components/BackButton"; 
+import { useNavigate } from "react-router-dom";
+import BackButton from "../components/BackButton";
+import SubmitRecipe from './AddNewRecipeForm';
 
 const Profile = () => {
   const [userRecipes, setUserRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [editingRecipe, setEditingRecipe] = useState(null);
 
   useEffect(() => {
     const loggedUser = sessionStorage.getItem("loggedInUser");
@@ -61,33 +65,77 @@ const Profile = () => {
       console.error("Error deleting recipe:", error.response ? error.response.data : error.message);
     }
   };
-  
+
+  const handleEdit = (recipeName) => {
+    navigate(`/edit-recipe/${recipeName}`);
+  };
 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "24px", color: "black", backgroundColor: "white", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
-      <h1>My Recipes</h1>
+    <div style={{maxWidth: "800px", margin: "0 auto", padding: "24px", color: "black", backgroundColor: "white", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
+      <h1 style={{ textAlign: "center" }}>My Recipes</h1>
       {userRecipes.length === 0 ? (
         <p>No recipes found. Start adding some!</p>
       ) : (
-        <ul>
+        <ul style={{ listStyle: "none", padding: 0 }}>
           {userRecipes.map((recipe) => (
-            <li key={recipe.name} style={{ padding: "12px", borderBottom: "1px solid #ddd", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <li key={recipe.name} style={{ 
+              padding: "12px", 
+              borderBottom: "1px solid #ddd", 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center",
+              ":hover": { backgroundColor: "#f9f9f9" }
+            }}>
               <div>
                 <strong>{recipe.name}</strong> - {categoryMapping[recipe.dishType] || recipe.dishType}<br />
                 <a href={`/recipe/${recipe.name}`} style={{ color: "#c28c5c" }}>View Recipe</a>
               </div>
-              <button 
-                onClick={() => handleDelete(recipe.name)} 
-                style={{ backgroundColor: "red", color: "white", padding: "6px 12px", border: "none", borderRadius: "4px", cursor: "pointer" }}>
-                X
-              </button>
+
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  onClick={() => handleEdit(recipe.name)}
+                  style={{
+                    backgroundColor: "#c28c5c",
+                    color: "white",
+                    padding: "6px 12px",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    ":hover": {
+                      backgroundColor: "#b07d4b"
+                    }
+                  }}
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => handleDelete(recipe.name)} 
+                  style={{ 
+                    backgroundColor: "#e74c3c",
+                    color: "white", 
+                    padding: "6px 12px", 
+                    border: "none", 
+                    borderRadius: "4px", 
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    ":hover": {
+                      backgroundColor: "#c0392b"
+                    }
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       )}
+      <div style={{ display: "flex", justifyContent: "center" }} >
       <BackButton />
+      </div>
     </div>
   );
 };

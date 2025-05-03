@@ -2,16 +2,19 @@ import React, { useState } from "react";
 import axios from "axios";
 import BackButton from "../components/BackButton";
 
-const SubmitRecipe = ({ onRecipeAdded }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    dishType: "MAIN_COURSE",
-    prepTime: "",
-    ingredients: [{ name: "" }],
-    steps: [{ step: "" }],
-    image: null
-  });
+const SubmitRecipe = ({ recipeToEdit = null, onRecipeAdded, onCancel }) => {
+  const [formData, setFormData] = useState(
+    recipeToEdit || {
+      name: "",
+      description: "",
+      dishType: "MAIN_COURSE",
+      prepTime: "",
+      ingredients: [{ name: "" }],
+      steps: [{ step: "" }],
+      image: null,
+      currentImageUrl: ""
+    }
+  );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,6 +51,7 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError("");
 
     const token = sessionStorage.getItem('authToken');
   
@@ -56,11 +60,15 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
       setIsSubmitting(false);
       return;
     }
-    
-
-    console.log('Token from sessionStorage:', token);
 
     try {
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
       const dishData = {
         name: formData.name,
         description: formData.description,
@@ -70,49 +78,64 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
         steps: formData.steps
       };
 
-      const axiosInstance = axios.create({
-        headers: {
-          'Authorization': token
-        }
-      });
-  
-      console.log('Making request with headers:', axiosInstance.defaults.headers);
-      console.log('Recipe data:', dishData);
+      let response;
 
-      const response = await axios.post('http://localhost:8090/api/dishes/add', dishData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('Dish added:', response.data);
-      
-      if (formData.image) {
-        const formDataImg = new FormData();
-        formDataImg.append("image", formData.image);
-        await axios.patch(
-          `http://localhost:8090/api/dishes/${response.data.name}/image`, formDataImg,
+      if (recipeToEdit) {
+        // Update existing recipe
+        response = await axios.put(
+          `http://localhost:8090/api/dishes/updateDish/${recipeToEdit.name}`,
+          dishData,
+          config
         );
+
+        // Update image if changed
+        if (formData.image) {
+          const formDataImg = new FormData();
+          formDataImg.append("image", formData.image);
+          await axios.put(
+            `http://localhost:8090/api/dishes/updateDish/${formData.name}/image`,
+            formDataImg,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+        }
+      } else {
+        // Create new recipe
+        response = await axios.post(
+          'http://localhost:8090/api/dishes/add',
+          dishData,
+          config
+        );
+
+        // Add image if provided
+        if (formData.image) {
+          const formDataImg = new FormData();
+          formDataImg.append("image", formData.image);
+          await axios.patch(
+            `http://localhost:8090/api/dishes/${response.data.name}/image`,
+            formDataImg,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+        }
       }
 
-      setSuccess("Recipe submitted successfully!");
+      setSuccess(recipeToEdit ? "Recipe updated successfully!" : "Recipe submitted successfully!");
+      
       if (onRecipeAdded) {
         onRecipeAdded();
+      } else {
+        // Default navigation if no callback provided
+        window.location.href = `/recipe/${response.data.name}`;
       }
-      setError("");
-      setFormData({
-        name: "",
-        description: "",
-        dishType: "MAIN_COURSE",
-        prepTime: "",
-        ingredients: [{ name: "" }],
-        steps: [{ step: "" }],
-        image: null
-      });
     } catch (err) {
       setError(err.response?.data?.message || "Error submitting recipe");
-      setSuccess("");
     } finally {
       setIsSubmitting(false);
     }
@@ -121,9 +144,20 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <BackButton />
-        <h1 style={styles.title}>Share Your Recipe</h1>
-        <p style={styles.subtitle}>Fill in the details to add your culinary creation</p>
+        {onCancel ? (
+          <BackButton onClick={onCancel} />
+        ) : (
+          <BackButton />
+        )}
+        
+        <h1 style={styles.title}>
+          {recipeToEdit ? "Edit Your Recipe" : "Share Your Recipe"}
+        </h1>
+        <p style={styles.subtitle}>
+          {recipeToEdit 
+            ? "Update the details of your culinary creation" 
+            : "Fill in the details to add your culinary creation"}
+        </p>
 
         {error && <div style={styles.error}>{error}</div>}
         {success && <div style={styles.success}>{success}</div>}
@@ -265,6 +299,19 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
           {/* Image Upload */}
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Recipe Image</h2>
+            
+            {/* Show current image if editing and has image URL */}
+            {recipeToEdit && formData.currentImageUrl && (
+              <div style={styles.currentImageContainer}>
+                <img 
+                  src={formData.currentImageUrl} 
+                  alt={formData.name}
+                  style={styles.currentImage}
+                />
+                <p style={styles.currentImageText}>Current image</p>
+              </div>
+            )}
+            
             <div style={styles.formGroup}>
               <label style={styles.fileInputLabel}>
                 <input
@@ -289,13 +336,27 @@ const SubmitRecipe = ({ onRecipeAdded }) => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            style={isSubmitting ? styles.submitButtonDisabled : styles.submitButton}
-          >
-            {isSubmitting ? "Submitting..." : "Submit Recipe"}
-          </button>
+          <div style={styles.buttonContainer}>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={isSubmitting ? styles.submitButtonDisabled : styles.submitButton}
+            >
+              {isSubmitting 
+                ? "Submitting..." 
+                : recipeToEdit ? "Update Recipe" : "Submit Recipe"}
+            </button>
+            
+            {onCancel && (
+              <button 
+                type="button" 
+                onClick={onCancel}
+                style={styles.cancelButton}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </div>
     </div>
@@ -474,12 +535,12 @@ const styles = {
     cursor: "pointer",
     transition: "all 0.2s",
     ":hover": {
-      backgroundColor: "#4338ca"
+      backgroundColor: "#b07d4b"
     }
   },
   submitButtonDisabled: {
     padding: "14px",
-    backgroundColor: "#a5b4fc",
+    backgroundColor: "#cccccc",
     color: "white",
     border: "none",
     borderRadius: "8px",
@@ -502,6 +563,40 @@ const styles = {
     borderRadius: "8px",
     marginBottom: "16px",
     fontSize: "14px"
+  },
+  buttonContainer: {
+    display: "flex",
+    gap: "12px",
+    justifyContent: "center"
+  },
+  cancelButton: {
+    padding: "14px",
+    backgroundColor: "#f0f0f0",
+    color: "#333",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    ":hover": {
+      backgroundColor: "#e0e0e0"
+    }
+  },
+  currentImageContainer: {
+    marginBottom: "16px",
+    textAlign: "center"
+  },
+  currentImage: {
+    maxWidth: "100%",
+    maxHeight: "200px",
+    borderRadius: "8px",
+    border: "1px solid #e0e0e0"
+  },
+  currentImageText: {
+    fontSize: "14px",
+    color: "#666",
+    marginTop: "8px"
   }
 };
 

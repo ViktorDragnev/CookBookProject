@@ -56,4 +56,17 @@ public class UserServiceImpl implements UserService {
 
         return new UserProfileDto(user.getUsername(), simpleDishes);
     }
+
+    @Override
+    public void updateUsername(String username, String newUsername) {
+        UserEntity user = userRepository.findByUsername(username).get();
+        user.setUsername(newUsername);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(String username) {
+        UserEntity user = userRepository.findByUsername(username).get();
+        userRepository.delete(user);
+    }
 }

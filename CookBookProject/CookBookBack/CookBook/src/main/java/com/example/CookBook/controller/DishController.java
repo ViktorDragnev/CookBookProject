@@ -133,4 +133,29 @@ public class DishController {
         return new ResponseEntity<>(dishService.findDishesByName(name), HttpStatus.OK);
     }
 
+    @PutMapping(path = "/updateDish/{name}")
+    public ResponseEntity<String> updateDish(@PathVariable String name, @RequestBody DishDto dishDto, @RequestHeader("Authorization") String token) {
+        String jwt = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = JWTGenerator.getUsernameFromJWT(jwt);
+
+        if (dishDto != null) {
+            dishService.updateDish(name, dishDto, username);
+            return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>("Dish not found!", HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(path = "/updateDish/{name}/image")
+    public ResponseEntity<String> updateDish(@PathVariable String name, MultipartFile file, @RequestHeader("Authorization") String token) throws IOException {
+        String jwt = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = JWTGenerator.getUsernameFromJWT(jwt);
+
+        if (file != null) {
+            dishService.updateDishImage(name, file, username);
+            return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>("Dish not found!", HttpStatus.NOT_FOUND);
+    }
 }

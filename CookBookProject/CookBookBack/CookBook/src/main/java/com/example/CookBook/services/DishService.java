@@ -28,4 +28,8 @@ public interface DishService {
     List<DishDto> findDishesContainingMatchingIngredient(List<String> ingredientDtoList);
 
     List<DishDto> findDishesByName(String name);
+
+    void updateDish(String dishName, DishDto dishDto, String username);
+
+    void updateDishImage(String dishName, MultipartFile file, String username) throws IOException;
 }

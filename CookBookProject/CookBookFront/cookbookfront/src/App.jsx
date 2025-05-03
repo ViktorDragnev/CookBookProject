@@ -10,6 +10,7 @@ import Signup from "./pages/SignUp";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SubmitRecipe from "./pages/AddNewRecipeForm";
 import SearchResults from "./components/SearchResults";
+import AccountSettingsPage from "./pages/AccountSettingPage";
 
 const App = () => {
   const [recipes, setRecipes] = useState([]);
@@ -106,6 +107,9 @@ const App = () => {
             {/* Recipe Detail Page */}
             <Route path="/recipe/:name" element={<RecipeDetail />} />
 
+            {/* Edit Recipe Page */}
+            <Route path="/edit-recipe/:recipeName" element={<SubmitRecipe />} />
+
             {/* Search by Ingredients Page */}
             <Route path="/search-by-ingredients" element={<SearchByIngredients />} />
 
@@ -116,10 +120,13 @@ const App = () => {
             <Route path="/signup" element={<Signup />} />
 
             {/* Profile Page */}
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/accountRecipes" element={<Profile />} />
 
             {/* Search Results Page */}
             <Route path="/search-results" element={<SearchResults />} />
+
+            {/* Account Settings Page */}
+            <Route path="/accountSettings" element={<AccountSettingsPage />} />
         </Routes>
       </div>
     </main>

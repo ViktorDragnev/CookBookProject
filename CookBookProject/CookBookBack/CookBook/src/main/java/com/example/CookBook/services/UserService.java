@@ -8,4 +8,8 @@ public interface UserService {
     UserDto getUserByUsername(String username);
 
     UserProfileDto getUserProfile(String username);
+
+    void updateUsername(String username, String newUsername);
+
+    void deleteUser(String username);
 }

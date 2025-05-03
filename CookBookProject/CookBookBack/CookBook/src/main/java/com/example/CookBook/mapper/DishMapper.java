@@ -7,6 +7,7 @@ import com.example.CookBook.dtos.responses.StepDto;
 import com.example.CookBook.entities.Dish;
 import com.example.CookBook.entities.Ingredient;
 import com.example.CookBook.entities.Step;
+import com.example.CookBook.entities.UserEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -111,5 +112,16 @@ public class DishMapper {
             dishDtoList.add(dishDto);
         }
         return dishDtoList;
+    }
+
+    public static DishDto toCompleteDto(Dish dish) {
+        DishDto dishDto = new DishDto();
+        dishDto.setUser(UserMapper.mapToDto(dish.getUser()));
+        dishDto.setImageName(dish.getImageName());
+        dishDto.setImageType(dish.getImageType());
+        dishDto.setImage(dish.getImage());
+        dishDto.setIngredientList(DishMapper.toListIngredientDto(dish.getIngredientList()));
+        dishDto.setSteps(DishMapper.toListStepDto(dish.getSteps()));
+        return dishDto;
     }
 }
