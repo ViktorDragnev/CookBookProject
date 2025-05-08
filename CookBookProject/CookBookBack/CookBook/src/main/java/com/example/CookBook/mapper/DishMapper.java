@@ -116,6 +116,10 @@ public class DishMapper {
 
     public static DishDto toCompleteDto(Dish dish) {
         DishDto dishDto = new DishDto();
+        dishDto.setName(dish.getName());
+        dishDto.setDishType(dish.getDishType());
+        dishDto.setDescription(dish.getDescription());
+        dishDto.setPrepTime(dish.getPrepTime());
         dishDto.setUser(UserMapper.mapToDto(dish.getUser()));
         dishDto.setImageName(dish.getImageName());
         dishDto.setImageType(dish.getImageType());

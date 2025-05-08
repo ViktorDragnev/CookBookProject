@@ -6,7 +6,6 @@ const RecipesList = ({ recipes }) => {
   const [recipeImages, setRecipeImages] = useState({});
 
   useEffect(() => {
-    // Fetch images for all recipes
     const fetchImages = async () => {
       const imagePromises = recipes.map(async (recipe) => {
         try {
@@ -33,7 +32,6 @@ const RecipesList = ({ recipes }) => {
 
     fetchImages();
 
-    // Cleanup function to revoke object URLs
     return () => {
       Object.values(recipeImages).forEach(url => {
         if (url) URL.revokeObjectURL(url);

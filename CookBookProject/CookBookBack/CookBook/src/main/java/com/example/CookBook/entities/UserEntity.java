@@ -13,6 +13,9 @@ public class UserEntity {
     long id;
     @Column(unique = true)
     String username;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rating")
+    Rating rating;
     @JsonIgnore
     String password;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -44,6 +47,14 @@ public class UserEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Rating getRating() {
+        return rating;
+    }
+
+    public void setRating(Rating rating) {
+        this.rating = rating;
     }
 
     public String getPassword() {

@@ -2,7 +2,6 @@ package com.example.CookBook.dtos.responses;
 
 import com.example.CookBook.enums.DishType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SimpleDishDto {
@@ -13,8 +12,8 @@ public class SimpleDishDto {
     String imageName;
     String imageType;
     byte[] image;
-    List<IngredientDto> ingredientList = new ArrayList<>();
-    List<StepDto> steps = new ArrayList<>();
+    List<IngredientDto> ingredientList;
+    List<StepDto> steps;
 
     public SimpleDishDto(String name, DishType dishType, String description, String prepTime, String imageName, String imageType, byte[] image, List<IngredientDto> ingredientList, List<StepDto> steps) {
         this.name = name;

@@ -81,14 +81,12 @@ const SubmitRecipe = ({ recipeToEdit = null, onRecipeAdded, onCancel }) => {
       let response;
 
       if (recipeToEdit) {
-        // Update existing recipe
         response = await axios.put(
           `http://localhost:8090/api/dishes/updateDish/${recipeToEdit.name}`,
           dishData,
           config
         );
 
-        // Update image if changed
         if (formData.image) {
           const formDataImg = new FormData();
           formDataImg.append("image", formData.image);
@@ -103,14 +101,12 @@ const SubmitRecipe = ({ recipeToEdit = null, onRecipeAdded, onCancel }) => {
           );
         }
       } else {
-        // Create new recipe
         response = await axios.post(
           'http://localhost:8090/api/dishes/add',
           dishData,
           config
         );
 
-        // Add image if provided
         if (formData.image) {
           const formDataImg = new FormData();
           formDataImg.append("image", formData.image);
@@ -131,7 +127,6 @@ const SubmitRecipe = ({ recipeToEdit = null, onRecipeAdded, onCancel }) => {
       if (onRecipeAdded) {
         onRecipeAdded();
       } else {
-        // Default navigation if no callback provided
         window.location.href = `/recipe/${response.data.name}`;
       }
     } catch (err) {

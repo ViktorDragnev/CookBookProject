@@ -6,9 +6,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8090', // Your backend
+        target: 'http://localhost:8090',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''), // Optional, if needed
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
