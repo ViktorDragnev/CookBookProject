@@ -26,4 +26,15 @@ public class RatingController {
         ratingService.addRating(username, ratingRequestDto);
         return new ResponseEntity<>("Rating added successfully!", HttpStatus.CREATED);
     }
+
+    @GetMapping
+    public ResponseEntity<String> getRating(@RequestHeader("Authorization") String token){
+        String jwt = token.startsWith("Bearer ") ? token.substring(7) : token;
+        String username = JWTGenerator.getUsernameFromJWT(jwt);
+        if(ratingService.existsRating(username)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }else{
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
 }

@@ -8,6 +8,9 @@ const AccountSettingsPage = () => {
   const [usernameError, setUsernameError] = useState("");
   const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
   const [usernameButtonHovered, setUsernameButtonHovered] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   const handleUsernameUpdate = async (e) => {
     e.preventDefault();
@@ -54,17 +57,40 @@ const AccountSettingsPage = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== "DELETE") {
+      setDeleteError("Please type 'DELETE' to confirm account deletion");
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError("");
+
+    try {
+      const token = sessionStorage.getItem("authToken");
+      if (!token) {
+        setDeleteError("You must be logged in to delete your account");
+        return;
+      }
+
+      await axios.delete("http://localhost:8090/api/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      sessionStorage.clear();
+      alert("Account deleted successfully!");
+      window.location.href = "/";
+    } catch (err) {
+      setDeleteError(err.response?.data || "Failed to delete account");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div style={{ maxWidth: "600px", margin: "2rem auto", padding: "1.5rem" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          textAlign: "center",
-        }}
-      >
-        <BackButton />
-      </div>
 
       <div
         style={{
@@ -92,6 +118,7 @@ const AccountSettingsPage = () => {
             padding: "1.5rem",
             borderRadius: "8px",
             border: "1px solid #f0e6d8",
+            marginBottom: "1.5rem",
           }}
         >
           <h2
@@ -205,6 +232,105 @@ const AccountSettingsPage = () => {
               {isUpdatingUsername ? "Updating..." : "Update Username"}
             </button>
           </form>
+        </div>
+
+        {/* Delete Account Section */}
+        <div
+          style={{
+            backgroundColor: "#fff5f5",
+            padding: "1.5rem",
+            borderRadius: "8px",
+            border: "1px solid #ffebee",
+          }}
+        >
+          <h2
+            style={{
+              color: "#c62828",
+              marginBottom: "1rem",
+              fontSize: "1.25rem",
+            }}
+          >
+            Delete Account
+          </h2>
+
+          {deleteError && (
+            <div
+              style={{
+                color: "#d32f2f",
+                backgroundColor: "#ffebee",
+                padding: "0.75rem",
+                borderRadius: "4px",
+                marginBottom: "1rem",
+              }}
+            >
+              {deleteError}
+            </div>
+          )}
+
+          <div style={{ marginBottom: "1.5rem" }}>
+            <p style={{ color: "#5a3921", marginBottom: "1rem" }}>
+              This action cannot be undone. All your data will be permanently deleted.
+            </p>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "#5a3921",
+              }}
+            >
+              Type <strong>DELETE</strong> to confirm:
+            </label>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              style={{
+                width: "95%",
+                backgroundColor: "white",
+                color: "black",
+                padding: "0.75rem",
+                border: "1px solid #d7ccc8",
+                borderRadius: "4px",
+                fontSize: "1rem",
+              }}
+            />
+          </div>
+
+          <button
+            onClick={handleDeleteAccount}
+            disabled={isDeleting || deleteConfirm !== "DELETE"}
+            style={{
+              padding: "0.75rem 1.5rem",
+              backgroundColor: isDeleting
+                ? "#cccccc"
+                : deleteConfirm === "DELETE"
+                ? "#c62828"
+                : "#ef9a9a",
+              color: "white",
+              border: "none",
+              borderRadius: "25px",
+              cursor: isDeleting ? "not-allowed" : "pointer",
+              fontSize: "0.95rem",
+              fontWeight: "500",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "all 0.3s ease",
+              boxShadow: "0 2px 5px rgba(198, 40, 40, 0.3)",
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+            {isDeleting ? "Deleting..." : "Delete Account Permanently"}
+          </button>
         </div>
       </div>
     </div>

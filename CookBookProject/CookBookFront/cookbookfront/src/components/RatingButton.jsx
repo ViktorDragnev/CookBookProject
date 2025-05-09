@@ -1,8 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import RatingWindow from './RatingWindow';
+import axios from 'axios';
 
 const RatingButton = () => {
   const [showRating, setShowRating] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkRatingStatus = async () => {
+      try {
+        const authToken = sessionStorage.getItem('authToken');
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        
+        if (authToken && loggedInUser) {
+          const response = await axios.get('http://localhost:8090/api/ratings', {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          
+          setShowButton(response.status === 200);
+        } else {
+          setShowButton(false);
+        }
+      } catch (error) {
+        setShowButton(error.response?.status !== 403);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkRatingStatus();
+  }, []);
+
+  const handleSuccessfulSubmit = () => {
+    setShowButton(false);
+  };
 
   const styles = {
     button: {
@@ -32,6 +66,14 @@ const RatingButton = () => {
     }
   };
 
+   if (isLoading) {
+    return null;
+  }
+
+  if (!showButton) {
+    return null;
+  }
+
   return (
     <>
       <style>
@@ -59,7 +101,12 @@ const RatingButton = () => {
         ></span>
       </button>
       
-      {showRating && <RatingWindow onClose={() => setShowRating(false)} />}
+      {showRating && (
+        <RatingWindow 
+          onClose={() => setShowRating(false)} 
+          onSuccessfulSubmit={handleSuccessfulSubmit}
+        />
+      )}
     </>
   );
 };

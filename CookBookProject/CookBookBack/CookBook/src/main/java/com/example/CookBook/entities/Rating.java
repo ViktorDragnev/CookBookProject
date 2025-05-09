@@ -3,11 +3,8 @@ package com.example.CookBook.entities;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Table(name = "ratings")
-@NoArgsConstructor
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +13,8 @@ public class Rating {
     private UserEntity user;
     private int value;
     private String comment;
+
+    public Rating() {}
 
     public Rating(int value, String comment) {
         this.value = value;

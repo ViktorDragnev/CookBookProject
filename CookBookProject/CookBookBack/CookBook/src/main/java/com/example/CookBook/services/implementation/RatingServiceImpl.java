@@ -6,6 +6,7 @@ import com.example.CookBook.entities.UserEntity;
 import com.example.CookBook.repositories.RatingRepository;
 import com.example.CookBook.repositories.UserRepository;
 import com.example.CookBook.services.RatingService;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,10 +26,21 @@ public class RatingServiceImpl implements RatingService {
         if(user.getRating() == null) {
             Rating rating = new Rating(ratingRequestDto.getValue(), ratingRequestDto.getComment());
             rating.setUser(user);
-            ratingRepository.save(rating);
             user.setRating(rating);
+            ratingRepository.save(rating);
             userRepository.save(user);
         }else
             throw new IllegalArgumentException();
+    }
+
+    @Override
+    public boolean existsRating(String username) {
+        UserEntity user = userRepository.findByUsername(username).get();
+
+        if(user.getRating() != null) {
+            return true;
+        }
+
+        return false;
     }
 }

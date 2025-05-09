@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const RatingWindow = ({ onClose }) => {
+const RatingWindow = ({ onClose, onSuccessfulSubmit }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const styles = {
     popup: {
@@ -102,7 +103,7 @@ const RatingWindow = ({ onClose }) => {
     try {
       const token = sessionStorage.getItem("authToken");
       const ratingData = {
-        ratingValue: rating,
+        value: rating,
         comment: rating < 5 ? feedback : null,
       };
 
@@ -113,7 +114,15 @@ const RatingWindow = ({ onClose }) => {
         },
       });
 
-      onClose();
+      setIsSubmitted(true);
+      
+      onSuccessfulSubmit();
+
+      alert("Rating submitted successfully!");
+      
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } catch (error) {
       console.error("Error submitting rating:", error);
       alert("Failed to submit rating. Please try again.");
@@ -169,7 +178,7 @@ const RatingWindow = ({ onClose }) => {
         className="submit-rating-button"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Submitting..." : "Submit Rating"}
+        {isSubmitting ? "Submitting..." : isSubmitted ? "Rating Submitted!" : "Submit Rating"}
         <span style={styles.highlight} className="button-highlight"></span>
       </button>
 
